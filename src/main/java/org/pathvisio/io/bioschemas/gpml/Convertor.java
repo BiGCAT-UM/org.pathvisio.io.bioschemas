@@ -20,7 +20,7 @@ import org.pathvisio.libgpml.model.Pathway;
 import org.pathvisio.libgpml.model.PathwayModel;
 
 /**
- * Tool to convert a {@link Pathway} model into a Jena RDF model.
+ * Tool to convert a {@link Pathway} model into a Bioschemas JSON.
  */
 public class Convertor {
 
@@ -31,7 +31,27 @@ public class Convertor {
 	}
 
 	public String asBioschemas() {
-		return "";
+		Pathway pathway = this.pathway.getPathway();
+		String wpId = pathway.getXref().getId();
+
+		StringBuffer results = new StringBuffer();
+		results.append("[\n");
+		results.append("  {\n");
+		results.append("    \"@context\": \"https://schema.org/\",\n");
+		results.append("    \"@id\": \"https://wikipathways.github.io/pathways/").append(wpId).append(".html\",\n");
+		results.append("    \"@type\": \"Dataset\",\n");
+		results.append("    \"creator\": {\n");
+		results.append("      \"@type\": \"Organization\",\n");
+		results.append("      \"name\": \"WikiPathways\",\n");
+		results.append("    },\n");
+		if (pathway.getDescription() != null) {
+			results.append("    \"description\": \"").append(pathway.getDescription().replace("\"", "\\\"")).append("\",\n");
+		}
+		results.append("    \"license\": \"CC0\",\n");
+		results.append("    \"name\": \"").append(pathway.getTitle().replace("\"", "\\\"")).append("\",\n");
+		results.append("  }\n");
+		results.append("]\n");
+		return results.toString();
 	}
 
 }

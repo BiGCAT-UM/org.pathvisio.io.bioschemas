@@ -18,6 +18,8 @@ package org.pathvisio.io.bioschemas.gpml;
 
 import java.io.InputStream;
 
+import org.bridgedb.DataSource;
+import org.bridgedb.Xref;
 import org.junit.Assert;
 import org.junit.Test;
 import org.pathvisio.libgpml.model.PathwayModel;
@@ -30,9 +32,12 @@ public class ConvertorTest {
 		PathwayModel pathway = new PathwayModel();
 		InputStream gpmlStream = getClass().getResourceAsStream("/WP4846.gpml"); 
 		pathway.readFromXml(gpmlStream, true);
+		DataSource wpSource = DataSource.register("Wp", "WikiPathways").asDataSource();
+		pathway.getPathway().setXref(new Xref("WP4846", wpSource));
 
 		String json = new Convertor(pathway).asBioschemas();
 		Assert.assertNotNull(json);
+		System.out.println(json);
 	}
 	
 }
