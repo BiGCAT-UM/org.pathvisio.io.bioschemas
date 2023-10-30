@@ -16,6 +16,10 @@
 //
 package org.pathvisio.io.bioschemas.gpml;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.pathvisio.libgpml.model.DataNode;
 import org.pathvisio.libgpml.model.Pathway;
 import org.pathvisio.libgpml.model.PathwayModel;
 
@@ -49,7 +53,26 @@ public class Convertor {
 		}
 		results.append("    \"license\": \"CC0\",\n");
 		results.append("    \"name\": \"").append(pathway.getTitle().replace("\"", "\\\"")).append("\",\n");
-		results.append("  }\n");
+		results.append("  },\n");
+
+		// datanodes
+		Set<String> alreadyDone = new HashSet<>(); // only export unique nodes
+		for (DataNode node : this.pathway.getDataNodes()) {
+			if (node.getType().getName().equals("Metabolite") &&
+				node.getXref() != null) {
+				String bioreg = node.getXref().getBioregistryIdentifier();
+				if (!alreadyDone.contains(bioreg)) {
+					results.append("  {\n");
+					results.append("    \"@context\": \"https://schema.org/\",\n");
+					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
+					results.append("    \"@type\": \"MolecularEntity\",\n");
+					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
+					results.append("  },\n");
+					alreadyDone.add(bioreg);
+				}
+			}
+		}
+
 		results.append("]\n");
 		return results.toString();
 	}
