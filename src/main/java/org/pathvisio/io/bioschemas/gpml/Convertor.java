@@ -42,17 +42,18 @@ public class Convertor {
 		results.append("[\n");
 		results.append("  {\n");
 		results.append("    \"@context\": \"https://schema.org/\",\n");
-		results.append("    \"@id\": \"https://wikipathways.github.io/pathways/").append(wpId).append(".html\",\n");
+		results.append("    \"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\",\n");
 		results.append("    \"@type\": \"Dataset\",\n");
+		results.append("    \"name\": \"").append(pathway.getTitle().replace("\"", "\\\"")).append("\",\n");
+		results.append("    \"url\": \"https://wikipathways.github.io/pathways/").append(wpId).append(".html\",\n");
 		results.append("    \"creator\": {\n");
 		results.append("      \"@type\": \"Organization\",\n");
-		results.append("      \"name\": \"WikiPathways\",\n");
+		results.append("      \"name\": \"WikiPathways\"\n");
 		results.append("    },\n");
 		if (pathway.getDescription() != null) {
 			results.append("    \"description\": \"").append(pathway.getDescription().replace("\"", "\\\"")).append("\",\n");
 		}
-		results.append("    \"license\": \"CC0\",\n");
-		results.append("    \"name\": \"").append(pathway.getTitle().replace("\"", "\\\"")).append("\",\n");
+		results.append("    \"license\": \"CC0\"\n");
 		results.append("  },\n");
 
 		// datanodes
@@ -65,14 +66,16 @@ public class Convertor {
 					results.append("  {\n");
 					results.append("    \"@context\": \"https://schema.org/\",\n");
 					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
+					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					results.append("    \"@type\": \"MolecularEntity\",\n");
 					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
+					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
 					results.append("  },\n");
 					alreadyDone.add(bioreg);
 				}
 			}
 		}
-
+		results.append("  {}");
 		results.append("]\n");
 		return results.toString();
 	}
