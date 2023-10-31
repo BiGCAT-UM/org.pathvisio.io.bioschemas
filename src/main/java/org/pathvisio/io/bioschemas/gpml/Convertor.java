@@ -19,6 +19,7 @@ package org.pathvisio.io.bioschemas.gpml;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bridgedb.bio.Organism;
 import org.pathvisio.libgpml.model.DataNode;
 import org.pathvisio.libgpml.model.Pathway;
 import org.pathvisio.libgpml.model.PathwayModel;
@@ -56,6 +57,18 @@ public class Convertor {
 		results.append("    \"license\": \"CC0\"\n");
 		results.append("  },\n");
 
+		// taxon
+		String organism = pathway.getOrganism();
+		String taxonID = Organism.fromLatinName(organism).taxonomyID().getId();
+		String taxonURL = "http://purl.obolibrary.org/obo/NCBITaxon_" + taxonID;
+		results.append("  {\n");
+		results.append("    \"@context\": \"https://schema.org/\",\n");
+		results.append("    \"@id\": \"").append(taxonURL).append("\",\n");
+		results.append("    \"@type\": \"Taxon\",\n");
+		results.append("    \"name\": \"").append(organism).append("\",\n");
+		results.append("    \"identifier\": \"ncbitaxon:").append(taxonID).append("\"\n");
+		results.append("  },\n");
+
 		// datanodes
 		Set<String> alreadyDone = new HashSet<>(); // only export unique nodes
 		for (DataNode node : this.pathway.getDataNodes()) {
@@ -69,13 +82,14 @@ public class Convertor {
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					results.append("    \"@type\": \"MolecularEntity\",\n");
 					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
-					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
+					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
+					results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\"\n");
 					results.append("  },\n");
 					alreadyDone.add(bioreg);
 				}
 			}
 		}
-		results.append("  {}");
+		results.append("  {}\n");
 		results.append("]\n");
 		return results.toString();
 	}
