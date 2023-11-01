@@ -88,7 +88,8 @@ public class Convertor {
 					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					results.append("    \"@type\": \"").append(nodeType).append("\",\n");
-					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
+					String nodeName = node.getTextLabel().replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
+					results.append("    \"name\": \"").append(nodeName).append("\",\n");
 					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
 					results.append("  }");
 					alreadyDone.add(bioreg);
