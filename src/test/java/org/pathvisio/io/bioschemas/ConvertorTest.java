@@ -14,7 +14,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 //
-package org.pathvisio.io.bioschemas.gpml;
+package org.pathvisio.io.bioschemas;
 
 import java.io.InputStream;
 
@@ -22,6 +22,7 @@ import org.bridgedb.DataSource;
 import org.bridgedb.Xref;
 import org.junit.Assert;
 import org.junit.Test;
+import org.pathvisio.io.bioschemas.Convertor;
 import org.pathvisio.libgpml.model.PathwayModel;
 
 public class ConvertorTest {
