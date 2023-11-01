@@ -107,6 +107,8 @@ public class Convertor {
 				}
 			}
 		}
+		if (alreadyDone.size() == 0) // close the list because there are no datanodes, and we have the comma after the taxon
+			results.append("  {}\n");
 		results.append("\n]\n");
 		return results.toString();
 	}
