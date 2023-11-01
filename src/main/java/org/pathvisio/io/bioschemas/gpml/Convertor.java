@@ -38,6 +38,9 @@ public class Convertor {
 	public String asBioschemas() {
 		Pathway pathway = this.pathway.getPathway();
 		String wpId = pathway.getXref().getId();
+		String organism = pathway.getOrganism();
+		String taxonID = Organism.fromLatinName(organism).taxonomyID().getId();
+		String taxonURL = "http://purl.obolibrary.org/obo/NCBITaxon_" + taxonID;
 
 		StringBuffer results = new StringBuffer();
 		results.append("[\n");
@@ -54,13 +57,11 @@ public class Convertor {
 		if (pathway.getDescription() != null) {
 			results.append("    \"description\": \"").append(pathway.getDescription().replace("\"", "\\\"")).append("\",\n");
 		}
+		results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\",\n");
 		results.append("    \"license\": \"CC0\"\n");
 		results.append("  },\n");
 
 		// taxon
-		String organism = pathway.getOrganism();
-		String taxonID = Organism.fromLatinName(organism).taxonomyID().getId();
-		String taxonURL = "http://purl.obolibrary.org/obo/NCBITaxon_" + taxonID;
 		results.append("  {\n");
 		results.append("    \"@context\": \"https://schema.org/\",\n");
 		results.append("    \"@id\": \"").append(taxonURL).append("\",\n");
@@ -88,8 +89,7 @@ public class Convertor {
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					results.append("    \"@type\": \"").append(nodeType).append("\",\n");
 					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
-					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
-					results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\"\n");
+					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
 					results.append("  }");
 					alreadyDone.add(bioreg);
 					justDidOne = true;
