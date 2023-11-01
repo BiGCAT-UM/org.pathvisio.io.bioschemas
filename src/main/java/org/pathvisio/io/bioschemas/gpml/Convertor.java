@@ -14,7 +14,9 @@
 //
 package org.pathvisio.io.bioschemas.gpml;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.bridgedb.bio.Organism;
@@ -69,16 +71,18 @@ public class Convertor {
 
 		// datanodes
 		Set<String> alreadyDone = new HashSet<>(); // only export unique nodes
+		Map<String,String> types = new HashMap<>();
+		types.put("Metabolite", "MolecularEntity");
 		for (DataNode node : this.pathway.getDataNodes()) {
-			if (node.getType().getName().equals("Metabolite") &&
-				node.getXref() != null) {
+			String nodeType = node.getType().getName();
+			if (types.containsKey(nodeType) && node.getXref() != null) {
 				String bioreg = node.getXref().getBioregistryIdentifier();
 				if (!alreadyDone.contains(bioreg)) {
 					results.append("  {\n");
 					results.append("    \"@context\": \"https://schema.org/\",\n");
 					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
-					results.append("    \"@type\": \"MolecularEntity\",\n");
+					results.append("    \"@type\": \"").append(nodeType).append("\",\n");
 					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
 					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
 					results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\"\n");
