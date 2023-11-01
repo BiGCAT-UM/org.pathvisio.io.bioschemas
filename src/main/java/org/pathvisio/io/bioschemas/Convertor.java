@@ -98,7 +98,7 @@ public class Convertor {
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					String bsType = types.get(nodeType);
 					results.append("    \"@type\": \"").append(bsType).append("\",\n");
-					String nodeName = node.getTextLabel().replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
+					String nodeName = node.getTextLabel().trim().replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
 					results.append("    \"name\": \"").append(nodeName).append("\",\n");
 					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
 					results.append("  }");
