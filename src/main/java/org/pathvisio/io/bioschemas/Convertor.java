@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +27,8 @@ import java.util.Set;
 import org.bridgedb.DataSource;
 import org.bridgedb.Xref;
 import org.bridgedb.bio.Organism;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.pathvisio.libgpml.model.DataNode;
 import org.pathvisio.libgpml.model.Pathway;
 import org.pathvisio.libgpml.model.PathwayModel;
@@ -48,39 +51,41 @@ public class Convertor {
 		String taxonID = Organism.fromLatinName(organism).taxonomyID().getId();
 		String taxonURL = "http://purl.obolibrary.org/obo/NCBITaxon_" + taxonID;
 
-		StringBuffer results = new StringBuffer();
-		results.append("[\n");
-		results.append("  {\n");
-		results.append("    \"@context\": \"https://schema.org/\",\n");
-		results.append("    \"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\",\n");
-		results.append("    \"@type\": \"Dataset\",\n");
-		results.append("    \"name\": \"").append(pathway.getTitle().replace("\"", "\\\"")).append("\",\n");
-		results.append("    \"url\": \"https://wikipathways.github.io/pathways/").append(wpId).append(".html\",\n");
-		results.append("    \"creator\": {\n");
-		results.append("      \"@type\": \"Organization\",\n");
-		results.append("      \"name\": \"WikiPathways\"\n");
-		results.append("    },\n");
+		JSONArray root = new JSONArray(new ArrayList<>());
+
+		JSONObject shortDataset = new JSONObject();
+		shortDataset.put("@id", "https://identifiers.org/wikipathways:" + wpId);
+		shortDataset.put("@type", "Dataset");
+
+		JSONObject dataset = new JSONObject();
+		dataset.put("@context", "https://schema.org/");
+		dataset.put("@id", "https://identifiers.org/wikipathways:" + wpId);
+		dataset.put("@type", "Dataset");
+		dataset.put("name", pathway.getTitle());
+		dataset.put("url", "https://wikipathways.github.io/pathways/" + wpId);
+		Map<String,String> creator = new HashMap<>();
+		creator.put("@type", "Organization");
+		creator.put("name", "WikiPathways");
+		dataset.put("creator", creator);
 		if (pathway.getDescription() != null) {
-			String description = pathway.getDescription().replace("\"", "\\\"")
-				.replace("\n", " ").replace("\r", "");
-			results.append("    \"description\": \"").append(description).append("\",\n");
+			String description = pathway.getDescription();
+			dataset.put("description", description);
 		}
-		results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\",\n");
-		results.append("    \"license\": \"CC0\"\n");
-		results.append("  },\n");
+		dataset.put("taxonomicRange", taxonURL);
+		dataset.put("license", "CC0");
+		root.put(dataset);
 
 		// taxon
-		results.append("  {\n");
-		results.append("    \"@context\": \"https://schema.org/\",\n");
-		results.append("    \"@id\": \"").append(taxonURL).append("\",\n");
-		results.append("    \"@type\": \"Taxon\",\n");
-		results.append("    \"name\": \"").append(organism).append("\",\n");
-		results.append("    \"identifier\": \"ncbitaxon:").append(taxonID).append("\"\n");
-		results.append("  },\n");
+		JSONObject taxon = new JSONObject();
+		taxon.put("@context", "https://schema.org/");
+		taxon.put("@id", taxonURL);
+		taxon.put("@type", "Taxon");
+		taxon.put("name", "organism");
+		taxon.put("identifier", "ncbitaxon:" + taxonID);
+		root.put(taxon);
 
 		// datanodes
 		Set<String> alreadyDone = new HashSet<>(); // only export unique nodes
-		boolean justDidOne = false;
 		Map<String,String> types = new HashMap<>();
 		types.put("Metabolite", "MolecularEntity");
 		types.put("Protein", "Protein");
@@ -92,26 +97,21 @@ public class Convertor {
 				String bioreg = node.getXref().getBioregistryIdentifier();
 				if (!alreadyDone.contains(bioreg) && bioregPrefix != null && !bioregPrefix.isEmpty()) {
 					bioreg = bioreg.trim();
-					if (justDidOne) { results.append(",\n"); justDidOne = false; }
-					results.append("  {\n");
-					results.append("    \"@context\": \"https://schema.org/\",\n");
-					results.append("    \"@id\": \"https://bioregistry.org/").append(bioreg).append("\",\n");
-					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					String bsType = types.get(nodeType);
-					results.append("    \"@type\": \"").append(bsType).append("\",\n");
-					String nodeName = node.getTextLabel().trim().replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
-					results.append("    \"name\": \"").append(nodeName).append("\",\n");
-					results.append("    \"identifier\": \"").append(bioreg).append("\"\n");
-					results.append("  }");
+					String nodeName = node.getTextLabel().trim();
+					JSONObject datanode = new JSONObject();
+					datanode.put("@context", "https://schema.org/");
+					datanode.put("@id", "https://bioregistry.org/" + bioreg);
+					datanode.put("includedInDataset", shortDataset);
+					datanode.put("@type", bsType);
+					datanode.put("name", nodeName);
+					datanode.put("identifier", bioreg);
+					root.put(datanode);
 					alreadyDone.add(bioreg);
-					justDidOne = true;
 				}
 			}
 		}
-		if (alreadyDone.size() == 0) // close the list because there are no datanodes, and we have the comma after the taxon
-			results.append("  {}\n");
-		results.append("\n]\n");
-		return results.toString();
+		return root.toString(2);
 	}
 
 	public static void main(String[] args) throws Exception {
