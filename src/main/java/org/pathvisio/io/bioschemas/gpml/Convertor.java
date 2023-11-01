@@ -74,6 +74,8 @@ public class Convertor {
 		boolean justDidOne = false;
 		Map<String,String> types = new HashMap<>();
 		types.put("Metabolite", "MolecularEntity");
+		types.put("Protein", "Protein");
+		types.put("GeneProduct", "BioChemEntity");
 		for (DataNode node : this.pathway.getDataNodes()) {
 			String nodeType = node.getType().getName();
 			if (types.containsKey(nodeType) && node.getXref() != null) {
