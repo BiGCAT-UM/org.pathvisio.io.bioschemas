@@ -28,13 +28,31 @@ import org.pathvisio.libgpml.model.PathwayModel;
 public class ConvertorTest {
 
 	@Test
-	public void convert() throws Exception {
+	public void convertWP4846() throws Exception {
 		// read the pathway
 		PathwayModel pathway = new PathwayModel();
 		InputStream gpmlStream = getClass().getResourceAsStream("/WP4846.gpml"); 
 		pathway.readFromXml(gpmlStream, true);
 		DataSource wpSource = DataSource.register("Wp", "WikiPathways").asDataSource();
 		pathway.getPathway().setXref(new Xref("WP4846", wpSource));
+
+		String json = new Convertor(pathway).asBioschemas();
+		Assert.assertNotNull(json);
+		Assert.assertTrue(json.contains("WP4846"));
+		Assert.assertTrue(json.contains("Dataset"));
+		Assert.assertTrue(json.contains("Protein"));
+		Assert.assertTrue(json.contains("MolecularEntity"));
+		Assert.assertTrue(json.contains("9606"));
+	}
+
+	@Test
+	public void convertWP4364() throws Exception {
+		// read the pathway
+		PathwayModel pathway = new PathwayModel();
+		InputStream gpmlStream = getClass().getResourceAsStream("/WP4364.gpml");
+		pathway.readFromXml(gpmlStream, true);
+		DataSource wpSource = DataSource.register("Wp", "WikiPathways").asDataSource();
+		pathway.getPathway().setXref(new Xref("WP4364", wpSource));
 
 		String json = new Convertor(pathway).asBioschemas();
 		Assert.assertNotNull(json);
