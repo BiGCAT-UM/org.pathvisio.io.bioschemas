@@ -61,7 +61,9 @@ public class Convertor {
 		results.append("      \"name\": \"WikiPathways\"\n");
 		results.append("    },\n");
 		if (pathway.getDescription() != null) {
-			results.append("    \"description\": \"").append(pathway.getDescription().replace("\"", "\\\"")).append("\",\n");
+			String description = pathway.getDescription().replace("\"", "\\\"")
+				.replace("\n", " ").replace("\r", "");
+			results.append("    \"description\": \"").append(description).append("\",\n");
 		}
 		results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\",\n");
 		results.append("    \"license\": \"CC0\"\n");
