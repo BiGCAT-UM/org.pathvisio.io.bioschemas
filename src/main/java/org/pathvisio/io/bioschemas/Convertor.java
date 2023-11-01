@@ -89,8 +89,9 @@ public class Convertor {
 			String nodeType = node.getType().getName();
 			if (types.containsKey(nodeType) && node.getXref() != null) {
 				String bioregPrefix = node.getXref().getDataSource().getBioregistryPrefix();
-				String bioreg = node.getXref().getBioregistryIdentifier().trim();
+				String bioreg = node.getXref().getBioregistryIdentifier();
 				if (!alreadyDone.contains(bioreg) && bioregPrefix != null && !bioregPrefix.isEmpty()) {
+					bioreg = bioreg.trim();
 					if (justDidOne) { results.append(",\n"); justDidOne = false; }
 					results.append("  {\n");
 					results.append("    \"@context\": \"https://schema.org/\",\n");
