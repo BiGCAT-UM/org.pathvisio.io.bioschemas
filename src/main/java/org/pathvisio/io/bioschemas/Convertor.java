@@ -14,11 +14,17 @@
 //
 package org.pathvisio.io.bioschemas;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bridgedb.DataSource;
+import org.bridgedb.Xref;
 import org.bridgedb.bio.Organism;
 import org.pathvisio.libgpml.model.DataNode;
 import org.pathvisio.libgpml.model.Pathway;
@@ -100,6 +106,27 @@ public class Convertor {
 		}
 		results.append("\n]\n");
 		return results.toString();
+	}
+
+	public static void main(String[] args) throws Exception {
+        String gpmlFile = args[0];
+        String outFile  = args[1];
+        int index = gpmlFile.indexOf("WP");
+        String localFile = gpmlFile.substring(index);
+        String wpid     = localFile.substring(0,localFile.indexOf("."));
+
+        PathwayModel pathway = new PathwayModel();
+		InputStream gpmlStream = new FileInputStream(new File(gpmlFile));
+		pathway.readFromXml(gpmlStream, false);
+		DataSource wpSource = DataSource.register("Wp", "WikiPathways").asDataSource();
+		pathway.getPathway().setXref(new Xref(wpid, wpSource));
+
+		Convertor convertor = new Convertor(pathway);
+
+		FileOutputStream output = new FileOutputStream(outFile);
+		output.write(convertor.asBioschemas().getBytes());
+        output.flush();
+        output.close();
 	}
 
 }
