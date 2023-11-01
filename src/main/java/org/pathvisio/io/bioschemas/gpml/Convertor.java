@@ -71,6 +71,7 @@ public class Convertor {
 
 		// datanodes
 		Set<String> alreadyDone = new HashSet<>(); // only export unique nodes
+		boolean justDidOne = false;
 		Map<String,String> types = new HashMap<>();
 		types.put("Metabolite", "MolecularEntity");
 		for (DataNode node : this.pathway.getDataNodes()) {
@@ -78,6 +79,7 @@ public class Convertor {
 			if (types.containsKey(nodeType) && node.getXref() != null) {
 				String bioreg = node.getXref().getBioregistryIdentifier();
 				if (!alreadyDone.contains(bioreg)) {
+					if (justDidOne) { results.append(",\n"); justDidOne = false; }
 					results.append("  {\n");
 					results.append("    \"@context\": \"https://schema.org/\",\n");
 					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
@@ -86,13 +88,13 @@ public class Convertor {
 					results.append("    \"name\": \"").append(node.getTextLabel().replace("\"", "\\\"")).append("\",\n");
 					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
 					results.append("    \"taxonomicRange\": \"").append(taxonURL).append("\"\n");
-					results.append("  },\n");
+					results.append("  }");
 					alreadyDone.add(bioreg);
+					justDidOne = true;
 				}
 			}
 		}
-		results.append("  {}\n");
-		results.append("]\n");
+		results.append("\n]\n");
 		return results.toString();
 	}
 
