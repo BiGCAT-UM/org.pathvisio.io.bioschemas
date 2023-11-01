@@ -89,18 +89,18 @@ public class Convertor {
 			String nodeType = node.getType().getName();
 			if (types.containsKey(nodeType) && node.getXref() != null) {
 				String bioregPrefix = node.getXref().getDataSource().getBioregistryPrefix();
-				String bioreg = node.getXref().getBioregistryIdentifier();
+				String bioreg = node.getXref().getBioregistryIdentifier().trim();
 				if (!alreadyDone.contains(bioreg) && bioregPrefix != null && !bioregPrefix.isEmpty()) {
 					if (justDidOne) { results.append(",\n"); justDidOne = false; }
 					results.append("  {\n");
 					results.append("    \"@context\": \"https://schema.org/\",\n");
-					results.append("    \"@id\": \"https://bioregistry.org/").append(node.getXref().getBioregistryIdentifier()).append("\",\n");
+					results.append("    \"@id\": \"https://bioregistry.org/").append(bioreg).append("\",\n");
 					results.append("    \"includedInDataset\": {\"@id\": \"https://identifiers.org/wikipathways:").append(wpId).append("\", \"@type\": \"Dataset\"},\n");
 					String bsType = types.get(nodeType);
 					results.append("    \"@type\": \"").append(bsType).append("\",\n");
 					String nodeName = node.getTextLabel().trim().replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
 					results.append("    \"name\": \"").append(nodeName).append("\",\n");
-					results.append("    \"identifier\": \"").append(node.getXref().getBioregistryIdentifier()).append("\"\n");
+					results.append("    \"identifier\": \"").append(bioreg).append("\"\n");
 					results.append("  }");
 					alreadyDone.add(bioreg);
 					justDidOne = true;
