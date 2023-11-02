@@ -43,6 +43,7 @@ public class ConvertorTest {
 		Assert.assertTrue(json.contains("Protein"));
 		Assert.assertTrue(json.contains("MolecularEntity"));
 		Assert.assertTrue(json.contains("9606"));
+		System.out.println(json);
 	}
 
 	@Test
@@ -56,7 +57,6 @@ public class ConvertorTest {
 
 		String json = new Convertor(pathway).asBioschemas();
 		Assert.assertNotNull(json);
-		System.out.println(json);
 	}
 	
 }
