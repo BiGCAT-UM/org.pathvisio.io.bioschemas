@@ -112,7 +112,7 @@ public class Convertor {
 					String nodeName = node.getTextLabel().trim();
 					JSONObject datanode = new JSONObject();
 					datanode.put("@context", "https://schema.org/");
-					datanode.put("@id", "https://bioregistry.org/" + bioreg);
+					datanode.put("@id", "https://bioregistry.io/" + bioreg);
 					datanode.put("includedInDataset", shortDataset);
 					datanode.put("@type", bsType);
 					datanode.put("name", nodeName);
