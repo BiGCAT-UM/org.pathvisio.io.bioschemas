@@ -13,7 +13,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <junit.version>5.10.0</junit.version>
     <libgpml.version>4.0.3</libgpml.version>
-    <json.version>20230618</json.version>
+    <json.version>20231013</json.version>
   </properties>
 
   <distributionManagement>
